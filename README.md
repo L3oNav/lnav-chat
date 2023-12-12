@@ -1,6 +1,4 @@
-# Chat Application for Session Management
-
-This is an Chat application that allows you to save the session on cookies and manage it with a middleware. It provides login functionality using Google Chat.
+# Chat Application for LNav Application
 
 ## Table of Contents
 - [Development](#development)
