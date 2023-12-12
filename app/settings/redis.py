@@ -1,3 +1,4 @@
 import redis
 
-r = redis.Redis(host="redis", port=6379)
+def get_redis_connection():
+    return redis.Redis(host="redis")

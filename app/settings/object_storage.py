@@ -18,8 +18,8 @@ s3 = boto3.client(
     region_name             = get_settings().OBJECT_STORAGE_REGION,
     endpoint_url            = f"https://{get_settings().OBJECT_STORAGE_ENDPOINT_PUBLIC}"
 )
-
-def upload_file_to_bucket(file_obj, bucket = "audio", folder = "audios", object_name=None):
+    
+def upload_file_to_bucket(file_obj, bucket = "audio", folder = "messages", object_name=None):
     if object_name is None:
         object_name = FILE_DESTINATION
     # Upload the file
@@ -29,13 +29,13 @@ def upload_file_to_bucket(file_obj, bucket = "audio", folder = "audios", object_
             Key=f"{folder}/{object_name}", 
             Body=file_obj
         )
+
         response['public_url'] = s3.generate_presigned_url(
             'get_object',
             Params={
-                'Bucket': "generated",
-                'Key': f"qr/{object_name}"
-            },
-            ExpiresIn=3600
+                'Bucket': f"{bucket}",
+                'Key': f"{folder}/{object_name}"
+            }
         )
         return response
     except ClientError as e:
