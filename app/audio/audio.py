@@ -1,9 +1,10 @@
+import io
+from pydub import AudioSegment
 from app.settings.rabbitmq import rabbitmq
 import pika, json
 import uuid
 
 class Audio():
-    
 
     def __init__(self, sample_rate = 44100, segment_duration = 10):
         self.audio_bytes = b""
@@ -13,9 +14,9 @@ class Audio():
     def receive_audio(self, audio_bytes):
         self.audio_bytes += audio_bytes
 
-    def split_audio(self):
+    def split_audio(self, audio):
         segments = []
-        segment_duration_samples = int(segment_duration * sample_rate)
+        segment_duration_samples = int(segment_duration * self.sample_rate)
         num_segments = int(len(audio) / segment_duration_samples)
         for i in range(num_segments):
             start_sample  = i * segment_duration_samples
