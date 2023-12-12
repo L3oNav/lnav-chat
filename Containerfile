@@ -7,7 +7,7 @@ COPY requirements.txt .
 
 RUN apk update \
  && apk upgrade \
- && apk add --no-cache bash git openssh vim libffi-dev gcc libc-dev linux-headers postgresql-dev ffmpeg
+ && apk add bash git openssh vim libffi-dev gcc libc-dev linux-headers postgresql-dev ffmpeg 
 
 RUN python3.11 -m pip install pip --upgrade
 

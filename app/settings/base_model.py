@@ -1,8 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, DateTime
 
-
-
 class Base(DeclarativeBase):
     # Generate __tablename__ automatically
 

@@ -19,7 +19,7 @@ s3 = boto3.client(
     endpoint_url            = f"https://{get_settings().OBJECT_STORAGE_ENDPOINT_PUBLIC}"
 )
 
-def upload_file_to_bucket(file_obj, bucket = "generated", folder = "qr", object_name=None):
+def upload_file_to_bucket(file_obj, bucket = "audio", folder = "audios", object_name=None):
     if object_name is None:
         object_name = FILE_DESTINATION
     # Upload the file
