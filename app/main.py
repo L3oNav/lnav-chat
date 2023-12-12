@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette_authlib.middleware import AuthlibMiddleware as SessionMiddleware
 from starlette.responses import HTMLResponse
+from fastapi.testclient import TestClient
 from app.settings import get_settings
 import os
 
