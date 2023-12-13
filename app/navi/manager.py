@@ -13,7 +13,7 @@ from sqlalchemy import or_
 import asyncio
 import json
 
-class MessagerManager(Manager):
+class NaviManager(Manager):
    
     def __init__(self):
         self.session = db_session()
@@ -37,7 +37,9 @@ class MessagerManager(Manager):
             print(e)
             return False
 
-    async def new_message(self, sender_id, receiver_id, message):
+    async def new_message(self, sender, receiver, message):
+        sender_id = str(self.get_user_by_email(sender).first().id)
+        receiver_id = str(self.get_user_by_email(receiver).first().id)
         try:
             new_message = Message(
                 sender_id=sender_id,
@@ -51,7 +53,9 @@ class MessagerManager(Manager):
             print(e)
             return False
 
-    async def new_audio_message(self, sender_id, receiver_id, audio_file: UploadFile = File(...)):
+    async def new_audio_message(self, sender, receiver, audio_file: UploadFile = File(...)):
+        sender_id = str(self.get_user_by_email(sender).first().id)
+        receiver_id = str(self.get_user_by_email(receiver).first().id)
         try:
             response = self.upload_audio(audio_file)
             new_message = Message(
@@ -67,7 +71,9 @@ class MessagerManager(Manager):
             print(e)
             return False
 
-    async def new_file_message(self, sender_id, receiver_id, file: UploadFile = File(...)):
+    async def new_file_message(self, sender, receiver, file: UploadFile = File(...)):
+        sender_id = str(self.get_user_by_email(sender).first().id)
+        receiver_id = str(self.get_user_by_email(receiver).first().id)
         try:
             response = self.upload_file(file)
             new_message = Message(
@@ -82,3 +88,5 @@ class MessagerManager(Manager):
         except Exception as e:
             print(e)
             return False
+
+navi_manager = NaviManager()

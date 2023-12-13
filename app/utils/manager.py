@@ -1,4 +1,4 @@
-from fastapi import UploadFile, File
+from fastapi import UploadFile, File, HTTPException
 from app.settings.object_storage import upload_file_to_bucket
 import uuid
 
@@ -8,6 +8,7 @@ class Manager:
         self.KB = 1024
         self.MB = 1024 * self.KB
         self.MAX_SIZE = 25 * self.MB
+        self.permited_formats = ['png', 'jpg', 'jpeg', 'pdf', 'wav']
         self.redis = None
         self.session = None
 
@@ -27,6 +28,8 @@ class Manager:
         try:
             file_name = file.filename
             file_obj = file.file
+            if file_name.split('.')[-1] not in self.permited_formats:
+                raise HTTPException(status_code=400, detail="File format not permited")
             response = upload_file_to_bucket(file_obj, object_name=file_name)
             return response
         except Exception as e:
