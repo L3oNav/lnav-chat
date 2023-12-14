@@ -1,16 +1,21 @@
 from fastapi import UploadFile, File, HTTPException
 from app.settings.object_storage import upload_file_to_bucket
+from app.settings.redis import redis
+from app.settings.database import get_session
+from app.settings.rabbitmq import rabbitmq
 import uuid
 
 class Manager:
 
-    def __init__(self, session):
+    def __init__(self):
         self.KB = 1024
         self.MB = 1024 * self.KB
         self.MAX_SIZE = 25 * self.MB
         self.permited_formats = ['png', 'jpg', 'jpeg', 'pdf', 'wav']
-        self.redis = None
-        self.session = None
+        self.redis = redis
+        self.session = get_session
+        self.rabbitmq = rabbitmq
+        self.audio_queue = rabbitmq.queue_declare("audio_queue")
 
     async def download_audio(self, key):
         try:
