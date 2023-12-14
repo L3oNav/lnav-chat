@@ -9,7 +9,6 @@ async def messenger_endpoint(websocket: WebSocket):
     websocket_connection[user] = websocket
     try: 
         while True:
-                        
             if mesaage_type == 'text':
                 message_text = await websocket.receive_text()
                 message_data = json.loads(message_text)
@@ -25,7 +24,7 @@ async def messenger_endpoint(websocket: WebSocket):
                 )
                 await websocket_connection[message_data['receiver']].send_text(message_text)
 
-            if message_type == 'file/pdf':
+            if message_type == 'file':
                 file = await websocket.receive_bytes()
                 navi_manager.new_file_message(
                     sender=user, receiver=message_data['receiver'], file=file

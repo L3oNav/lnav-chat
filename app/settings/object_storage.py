@@ -41,3 +41,11 @@ def upload_file_to_bucket(file_obj, bucket = "audio", folder = "messages", objec
     except ClientError as e:
         logging.error(e)
         return False
+
+def download_file_from_bucket(bucket = "audio", folder = "messages", object_name=None):
+    try:
+        file = s3.Object(bucket, f"{folder}/{object_name}").get()['Body'].read()
+        return response
+    except ClientError as e:
+        logging.error(e)
+        return False

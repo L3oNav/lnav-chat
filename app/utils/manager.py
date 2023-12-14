@@ -12,6 +12,14 @@ class Manager:
         self.redis = None
         self.session = None
 
+    async def download_audio(self, key):
+        try:
+            response = download_file_from_bucket(object_name=key)
+            return response
+        except Exception as e:
+            print(e)
+            return False
+
     async def upload_audio(self, file: UploadFile = File(...)):
         try:
             if self.MAX_SIZE < (file.size * self.MB):

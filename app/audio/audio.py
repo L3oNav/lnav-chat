@@ -1,56 +1,31 @@
-import io
+from app.utils import Manager
+from FASTAPI import UploadFile, File
 from pydub import AudioSegment
 from app.settings.rabbitmq import rabbitmq
-import pika, json
-import uuid
+import pika, json, uuid, io
 
-class Audio():
+class Audio(Manager):
 
-    def __init__(self, sample_rate = 44100, segment_duration = 10):
-        self.audio_bytes = b""
+    def __init__(self, sample_rate = 44100, segment_duration = 15000):
         self.sample_rate = sample_rate
         self.segment_duration = segment_duration
+        self.queue = rabbitmq.queue_declare(queue="audio_processing")
 
-    def receive_audio(self, audio_bytes):
-        self.audio_bytes += audio_bytes
-
-    def split_audio(self, audio):
-        segments = []
-        segment_duration_samples = int(segment_duration * self.sample_rate)
-        num_segments = int(len(audio) / segment_duration_samples)
-        for i in range(num_segments):
-            start_sample  = i * segment_duration_samples
-            end_sample    = start_sample + segment_duration_samples
-            segment_audio = audio[start_sample:end_sample]
-            segments.append(segment_audio)
-        return segments
-
-    def save_segments(self):
-        audio_segments = self.split_audio()
-        segment_filenames = []
-        for i, segment_audio in enumerate(audio_segments):
-            filename = f"{str(uuid.uuid4())}.wav"
-            # TODO: upload to s3
-            self.save_wav(filename, segment_audio)
-            segment_filenames.append(filename)
-        return segment_filenames
-
-    def save_wav(self, filename, audio):
-        wave_data = audio.to_buffer()
-        with wave_data.open(filename, 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframe_rate(self.sample_rate)
-            wf.writeframes(wave_data)
-        message = {
-            "user_id": f"3bc34bdb-4538-43dd-86ea-c4132b58939d",
-            "filename": filename
-        }
-        rabbitmq.basic_publish(
-            exchange="",
-            routing_key="audio",
-            body=json.dumps(message),
-            properties=pika.BasicProperties(
-                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
-            )
-        )
+    def new_audio(self, filename, audio_url):
+        file = self.download_file(audio_url)
+        audio = AudioSegment.from_file(file, format="wav")
+        return self.split_and_upload(filename, audio, audio_url)
+   
+    def split_and_upload(self, filename, audio, audio_url):
+        audio_duration = len(audio)
+        if audio_duration <= block_duration:
+            self.publish_to_queue(body={"audio_url": audio_url, "filename": filename})
+        else:
+            for i in range(0, audio_duration, self.segment_duration):
+                audio_segment = audio[i:i+self.segment_duration]
+                segment_name = f"{filename}-{str(uuid.uuidv4())}.wav"
+                audio_segment.export(segment_name, format="wav")
+                self.publish_to_queue(body={"audio_url": audio_url, "filename": segment_name})
+    
+    def publish_queue(self, body):
+        rabbitmq.basic_publish(exchange="", routing_key="audio_processing", body=body)
